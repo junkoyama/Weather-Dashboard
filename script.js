@@ -1,16 +1,23 @@
 $(document).ready(function () {
   var APIKey = "6d2b6b9cf67e7c416ba9a947cbfcd77e";
   var queryURL;
-  var today = moment(new Date()).format("MM/DD/YYYY");
+  var weatherIconUrl;
+  var todayDate = moment(new Date()).format("MM/DD/YYYY");
 
   function getCurrentCondition(url, data) {
     console.log(url);
     console.log(data);
+    var weatherIcon = data.weather[0].icon;
 
+    weatherIconUrl = "http://openweathermap.org/img/wn/" +
+    weatherIcon +
+    ".png"
+    
     // Transfer content to HTML
-    $(".city").html(`<h1> ${data.name} Weather Details for ${today} </h1>`);
+    $("#today").html(`<h1> ${data.name} Weather Details for ${todayDate} <img class="weather-icon" src="icons/unknown.png"/> </h1>`);
     $(".wind").text(`Wind Speed: ${data.wind.speed}`);
     $(".humidity").text(`Humidity: ${data.main.humidity}`);
+    $(".weather-icon").attr('src', weatherIconUrl);
 
     // Convert the temp to fahrenheit
     var tempF = (data.main.temp - 273.15) * 1.8 + 32;
