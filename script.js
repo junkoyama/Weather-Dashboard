@@ -7,21 +7,20 @@ $(document).ready(function() {
       console.log(data);
   
       // Transfer content to HTML
-      $(".city").html("<h1>" + data.name + " Weather Details</h1>");
-      $(".wind").text("Wind Speed: " + data.wind.speed);
-      $(".humidity").text("Humidity: " + data.main.humidity);
+      $(".city").html(`<h1> ${data.name} Weather Details </h1>`);
+      $(".wind").text(`Wind Speed: ${data.wind.speed}`);
+      $(".humidity").text(`Humidity: ${data.main.humidity}`);
   
       // Convert the temp to fahrenheit
       var tempF = (data.main.temp - 273.15) * 1.8 + 32;
   
       // add temp content to html
-      $(".temp").text("Temperature (K) " + data.main.temp);
-      $(".tempF").text("Temperature (F) " + tempF.toFixed(2));
+      $(".tempF").text(`Temperature (F) ${tempF.toFixed(2)}`);
   
       // Log the data in the console as well
-      console.log("Wind Speed: " + data.wind.speed);
-      console.log("Humidity: " + data.main.humidity);
-      console.log("Temperature (F): " + tempF);
+      console.log(`Wind Speed: ${data.wind.speed}`);
+      console.log(`Humidity: ${data.main.humidity}`);
+      console.log(`Temperature (F): ${tempF}`);
   };
   
   $("#search-button").on("click", function () {
