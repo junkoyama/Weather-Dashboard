@@ -47,13 +47,12 @@ $(document).ready(function () {
     $humidityDiv.append($windDiv);
     $windDiv.append($uvDiv);
     
-
-    // $(".wind").text(`Wind Speed: ${getWindSpeed}`);
-    // $(".humidity").text(`Humidity: ${getHumidity}`);
     $(".weather-icon").attr('src', weatherIconUrl);
     // $(".UVindex").text(`UV Index: ${UV_index}`);
 
   };
+
+
   // Add event listener for search button click
   $("#search-button").on("click", function () {
     var inputField = $("#search-value").val();
@@ -71,7 +70,6 @@ $(document).ready(function () {
     $.ajax({
       url: queryURL,
       method: "GET",
-
     })
       // We store all of the retrieved data inside of an object called "response"
       .then(function (response) {
