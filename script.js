@@ -64,16 +64,23 @@ $(document).ready(function () {
   }; // end of current conditions
 
   //Run 5 day forecast condition
-  // function getForecastCondition(url, data) {
-  //   $("#forecast").text("<h1> 5-Day-Forecast: </h1>");
-  //   var forecastDiv = $("<div>"); // create new div in parent forecast div
-  //   forecastDiv.attr("class", "card");
+  function getForecastCondition() {
+    // $("#forecast").text("5-Day-Forecast: ");
+    var forecastDiv = $("<div>"); // create new div in parent forecast div
+    forecastDiv.attr("class", "card");
+    forecastDiv.attr("style", "width: 18rem;");
+    $("#forecast").append(forecastDiv);
 
-  //   var forecastTitle = $("<p>").text()
-  // }; // end of forecast
+    var forecastTitle = $(forecastDiv).html("<h5 class='card-title text-center'>5-Day-Forecast: </h5>");
+    console.log(forecastTitle);
+  }; // end of forecast
 
   // Add event listener for search button click. Keep in document ready function to run
   $("#search-button").on("click", function () {
+
+    //run getForecastCondition function
+    getForecastCondition();
+    
     //displays the forecast div when search is clicked
     $("#forecast").show();
 
