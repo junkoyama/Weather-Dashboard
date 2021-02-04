@@ -1,112 +1,208 @@
 $(document).ready(function () {
 
-  //hide the forecase div on page load
-  $("#forecast").hide();
+  // start of current condition function
+  function getCurrentCondition() {
+    var APIKey = "a168b7b3a607079be418902834224f6b";
+    var inputCityName = $("#search-value").val();
+    var queryURL;
 
-  var APIKey = "6d2b6b9cf67e7c416ba9a947cbfcd77e";
-  var queryURL;
-  var weatherIconUrl;
-  var $todayDiv = $("#today");
-  var $tempDiv = $('<div>');
-  var $humidityDiv = $('<div>');
-  var $windDiv = $('<div>');
-  var $uvDiv = $('<div>');
-  // var UV_index;
-
-  //Set variable for today's date from moment.js
-  var todayDate = moment(new Date()).format("MM/DD/YYYY");
-  var getTomorrowDate = moment().add(1, 'days').format("MM/DD/YYYY");
-  var getDay2ForecastDate = moment().add(2, 'days').format("MM/DD/YYYY");
-  var getDay3ForecastDate = moment().add(3, 'days').format("MM/DD/YYYY");
-  var getDay4ForecastDate = moment().add(4, 'days').format("MM/DD/YYYY");
-  var getDay5ForecastDate = moment().add(5, 'days').format("MM/DD/YYYY");
-  console.log(getTomorrowDate, getDay2ForecastDate,  getDay3ForecastDate, getDay4ForecastDate, getDay5ForecastDate);
-  
-
-  //Run current weather conditions
-  function getCurrentCondition(url, data) {
-    var getCityName = data.name;
-    var weatherIcon = data.weather[0].icon;
-    var getLatitude = data.coord.lat;
-    var getLongitude = data.coord.lon;
-    var getWindSpeed = data.wind.speed;
-    var getHumidity = data.main.humidity;
-    var tempF = (data.main.temp - 273.15) * 1.8 + 32;
-    console.log(getLongitude + ", " + getLatitude);
-
-    // Adds weather icon next to city name weather details
-    weatherIconUrl = "http://openweathermap.org/img/wn/" +
-    weatherIcon +
-    ".png";
-
-    UV_index = "http://api.openweathermap.org/data/2.5/uvi?lat="
-    + getLatitude +
-    "&lon=" +
-    getLongitude +
-    "&appid=" +
-    APIKey;
-    
-    // Adds text to the HTMl div class tags
-    $todayDiv.html(`<h1> ${getCityName} Weather Details for ${todayDate} <img class="weather-icon" src="icons/unknown.png"/> </h1>`);
-    $tempDiv.text(`Temperature (F) ${tempF.toFixed(2)}`);
-    $humidityDiv.text(`Humidity: ${getHumidity}%`);
-    $windDiv.text(`Wind Speed: ${getWindSpeed}MPH`);
-    $uvDiv.text("UV Index: Still working on this div");
-
-    $todayDiv.append($tempDiv);
-    $tempDiv.append($humidityDiv);
-    $humidityDiv.append($windDiv);
-    $windDiv.append($uvDiv);
-    
-    $(".weather-icon").attr('src', weatherIconUrl);
-    // $(".UVindex").text(`UV Index: ${UV_index}`);
-
-  }; // end of current conditions
-
-  //Run 5 day forecast condition
-  function getForecastCondition() {
-    // $("#forecast").text("5-Day-Forecast: ");
-    var forecastDiv = $("<div>"); // create new div in parent forecast div
-    forecastDiv.attr("class", "card");
-    forecastDiv.attr("style", "width: 18rem;");
-    $("#forecast").append(forecastDiv);
-
-    var forecastTitle = $(forecastDiv).html("<h5 class='card-title text-center'>5-Day-Forecast: </h5>");
-    console.log(forecastTitle);
-  }; // end of forecast
-
-  // Add event listener for search button click. Keep in document ready function to run
-  $("#search-button").on("click", function () {
-
-    //run getForecastCondition function
-    getForecastCondition();
-    
-    //displays the forecast div when search is clicked
-    $("#forecast").show();
-
-    // set variable for value of search input
-    var inputField = $("#search-value").val();
-    // set variable for the search input weather condition URL
     queryURL =
-      "https://api.openweathermap.org/data/2.5/weather?" +
-      "q=" +
-      inputField +
-      "&appid=" +
+      "https://api.openweathermap.org/data/2.5/weather?q=" +
+      inputCityName +
+      "&units=imperial&appid=" +
       APIKey;
 
-    // Append the search history input value below the box
-    $(".search-history").append(`<p> ${inputField} </p>`);
-
-    // Here we run our AJAX call to the OpenWeatherMap API
     $.ajax({
       url: queryURL,
       method: "GET",
-    })
-      // We store all of the retrieved data inside of an object called "response"
-      .then(function (response) {
-        getCurrentCondition(queryURL, response);
-        console.log(response);
-      });
-  }); // end of search button listener
+    }).then(function (response) {
+      // console.log(response);
+      var getResponseCityName = response.name; 
+      var getResponseTempF = response.main.temp;
+      var getResponseHumidity = response.main.humidity; 
+      var getResponseWindSpeed = response.wind.speed;
+      var weatherIcon = response.weather[0].icon; 
+      var todayDate = moment(new Date()).format("MM/DD/YYYY");
+      var weatherIconUrl;
+      var getLatitude = response.coord.lat;
+      var getLongitude = response.coord.lon;
 
-});
+      weatherIconUrl =
+        "http://openweathermap.org/img/wn/" + weatherIcon + ".png";
+
+      $("#today").empty();
+      $("#today")
+      .append(
+        `<div>
+          <h1> ${getResponseCityName}'s Weather for ${todayDate} <img class="weather-icon" src="${weatherIconUrl}"/> </h2>
+          <p> Temperature: ${getResponseTempF}&deg;F </p>
+          <p> Humidity: ${getResponseHumidity}% </p>
+          <p> Wind Speed: ${getResponseWindSpeed} mph </p>
+        </div>
+        `);
+
+      getUvIndex(getLatitude, getLongitude);
+    });
+  } // end of current condition function
+
+  // start of retrieving UV index
+  function getUvIndex(latitude, Longitude) {
+    var APIKey = "a168b7b3a607079be418902834224f6b";
+    var uvIndexUrl =
+      "http://api.openweathermap.org/data/2.5/uvi?appid=" +
+      APIKey +
+      "&lat=" +
+      latitude +
+      "&lon=" +
+      Longitude;
+
+    $.ajax({
+      type: "GET",
+      url: uvIndexUrl,
+    }).then(function (response) {
+
+      var uvIndexVal = response.value;
+      $("#today").append(`<p class="show-uv"> UV Index: </p>`);
+      $(".show-uv").append(
+        $(`<span class="spanClass btn btn-sm"> ${uvIndexVal} </span>`)
+      );
+      var spanClass = $(".spanClass");
+
+      if (uvIndexVal < 3) {
+        spanClass.addClass("btn-success");
+      } else if (uvIndexVal < 7) {
+        spanClass.addClass("btn-warning");
+      } else {
+        spanClass.addClass("btn-danger");
+      }
+    });
+  } // end of retrieving UV index
+
+  //start of future forecast cards
+  function getFutureForecast() {
+    var APIKey = "a168b7b3a607079be418902834224f6b";
+    var inputCityName = $("#search-value").val();
+    var forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?q=" +
+      inputCityName +
+      "&units=imperial&appid=" +
+      APIKey;
+
+    $.ajax({
+      url: forecastUrl,
+      method: "GET"
+    }).then(function (response) {
+
+      var dayOneDate = moment(response.list[3].dt_txt).format("MM/DD/YYYY");
+      var dayOneTemp = response.list[3].main.temp;
+      var dayOneHumidity = response.list[3].main.humidity;
+      var dayOneforecastIcon = response.list[3].weather[0].icon;
+      var dayOneforecastConditionImgSource = "http://openweathermap.org/img/wn/" + dayOneforecastIcon + ".png";
+
+      var dayOneforecastCardDiv = $("<div class='row'>");
+
+      dayOneforecastCardDiv.html(`
+      <div class="card-body text-white bg-primary mb-3" style="max-width: 18rem;">
+        <h5 class="card-title">${dayOneDate}</h5>
+        <img src=" ${dayOneforecastConditionImgSource}" alt="forecastConditionIcon"> <img>
+        <div class="card-text">
+          Temp: ${dayOneTemp}&deg;F
+        </div>
+        <div class="card-text">
+        Humidity: ${dayOneHumidity}%
+        </div>
+      </div>
+      `);
+
+      var dayTwoforecastCardDiv = $("<div>");
+      var dayTwoDate = moment(response.list[11].dt_txt).format("MM/DD/YYYY");
+      var dayTwoTemp = response.list[11].main.temp;
+      var dayTwoHumidity = response.list[11].main.humidity;
+      var dayTwoforecastIcon = response.list[11].weather[0].icon;
+      var dayTwoforecastConditionImgSource = "http://openweathermap.org/img/wn/" + dayTwoforecastIcon + ".png";
+
+      dayTwoforecastCardDiv.html(`
+      <div class="card-body text-white bg-primary mb-3" style="max-width: 18rem;">
+        <h5 class="card-title">${dayTwoDate}</h5>
+        <img src=" ${dayTwoforecastConditionImgSource}" alt="forecastConditionIcon"> <img>
+        <div class="card-text">
+          Temp: ${dayTwoTemp}&deg;F
+        </div>
+        <div class="card-text">
+        Humidity: ${dayTwoHumidity}%
+        </div>
+      </div>
+      `);
+
+      var dayThreeforecastCardDiv = $("<div>");
+      var dayThreeDate = moment(response.list[19].dt_txt).format("MM/DD/YYYY");
+      var dayThreeTemp = response.list[19].main.temp;
+      var dayThreeHumidity = response.list[19].main.humidity;
+      var dayThreeForecastIcon = response.list[19].weather[0].icon;
+      var dayThreeForecastConditionImgSource = "http://openweathermap.org/img/wn/" + dayThreeForecastIcon + ".png";
+
+      dayThreeforecastCardDiv.html(`
+      <div class="card-body text-white bg-primary mb-3" style="max-width: 18rem;">
+        <h5 class="card-title">${dayThreeDate}</h5>
+        <img src=" ${dayThreeForecastConditionImgSource}" alt="forecastConditionIcon"> <img>
+        <div class="card-text">
+          Temp: ${dayThreeTemp}&deg;F
+        </div>
+        <div class="card-text">
+        Humidity: ${dayThreeHumidity}%
+        </div>
+      </div>
+      `);
+
+      var dayFourForecastCardDiv = $("<div>");
+      var dayFourDate = moment(response.list[27].dt_txt).format("MM/DD/YYYY");
+      var dayFourTemp = response.list[27].main.temp;
+      var dayFourHumidity = response.list[27].main.humidity;
+      var dayFourForecastIcon = response.list[27].weather[0].icon;
+      var dayFourForecastConditionImgSource = "http://openweathermap.org/img/wn/" + dayFourForecastIcon + ".png";
+
+      dayFourForecastCardDiv.html(`
+      <div class="card-body text-white bg-primary mb-3" style="max-width: 18rem;">
+        <h5 class="card-title">${dayFourDate}</h5>
+        <img src=" ${dayFourForecastConditionImgSource}" alt="forecastConditionIcon"> <img>
+        <div class="card-text">
+          Temp: ${dayFourTemp}&deg;F
+        </div>
+        <div class="card-text">
+        Humidity: ${dayFourHumidity}%
+        </div>
+      </div>
+      `);
+
+      var dayFiveForecastCardDiv = $("<div>");
+      var dayFiveDate = moment(response.list[35].dt_txt).format("MM/DD/YYYY");
+      var dayFiveTemp = response.list[35].main.temp;
+      var dayFiveHumidity = response.list[35].main.humidity;
+      var dayFiveForecastIcon = response.list[35].weather[0].icon;
+      var dayFiveForecastConditionImgSource = "http://openweathermap.org/img/wn/" + dayFiveForecastIcon + ".png";
+
+      dayFiveForecastCardDiv.html(`
+      <div class="card-body text-white bg-primary mb-3" style="max-width: 18rem;">
+        <h5 class="card-title">${dayFiveDate}</h5>
+        <img src=" ${dayFiveForecastConditionImgSource}" alt="forecastConditionIcon"> <img>
+        <div class="card-text">
+          Temp: ${dayFiveTemp}&deg;F
+        </div>
+        <div class="card-text">
+        Humidity: ${dayFiveHumidity}%
+        </div>
+      </div>
+      `);
+
+      $("#forecast").append(dayOneforecastCardDiv).append(dayTwoforecastCardDiv).append(dayThreeforecastCardDiv).append(dayFourForecastCardDiv).append(dayFiveForecastCardDiv);
+
+    });
+  } // end of future forecast cards
+
+  //start of search btn event listener
+  $("#search-button").on("click", function () {
+    var inputCityName = $("#search-value").val().trim();
+    $(".history").append(`<ul> ${inputCityName} </ul>`);
+    getCurrentCondition(inputCityName);
+    getFutureForecast();
+  }); // end of search btn event listener
+}); // end of doc ready function
