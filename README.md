@@ -7,4 +7,4 @@ My deployed link: https://junkoyama.github.io/Weather-Dashboard/
 ## Final Product
 The following screenshot demonstrates the final look of my website (using Boston as a search example):
 
-![weather dashboard screenshot](./Assets/screenshot.jpg)
+![weather dashboard screenshot](screenshot.jpg)
